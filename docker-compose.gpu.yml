@@ -1,0 +1,21 @@
+# Optional override: move the worker's local models (CLIP + AI-image detector)
+# onto an NVIDIA GPU. This is not the default: the CPU is fast enough for normal
+# return volumes. Use it only if image checks feel slow.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d worker
+#
+# Requires: NVIDIA driver + nvidia-container-toolkit on the host, and the worker
+# image rebuilt with a CUDA torch wheel (edit worker/Dockerfile's torch install
+# to `--index-url https://download.pytorch.org/whl/cu124`).
+
+services:
+  worker:
+    environment:
+      RG_TORCH_DEVICE: cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

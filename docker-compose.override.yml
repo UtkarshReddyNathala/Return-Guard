@@ -1,0 +1,28 @@
+# Local development settings, loaded automatically by Docker Compose. The source code
+# is mounted into the containers for live reload, and so generated files (such as new
+# Alembic migrations) appear on your computer.
+services:
+  backend:
+    volumes:
+      - ./backend:/app
+      - ./seed:/app/seed:ro
+      - ./docs:/app/docs:ro
+      - vault_creds:/vault-creds:ro
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  worker:
+    volumes:
+      - ./worker:/app
+      - ./ml:/app/ml
+      - ./docs:/app/docs
+      - vault_creds:/vault-creds:ro
+      - hf_cache:/root/.cache/huggingface   # CLIP/detector weights persist across recreate
+    # Port 9100 is not opened on your computer. Prometheus reads it over the Docker
+    # network (worker:9100, see infra/prometheus/prometheus.yml), and a fixed host
+    # port would stop `docker compose up -d --scale worker=N` from working (every
+    # worker copy would need the same port). To see the metrics directly, use
+    # `docker compose exec worker curl localhost:9100/metrics`, or Grafana/Prometheus.
+
+  mcp-server:
+    volumes:
+      - ./mcp-server:/app

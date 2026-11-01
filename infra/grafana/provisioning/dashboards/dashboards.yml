@@ -1,0 +1,11 @@
+# Tells Grafana to load the ReturnGuard dashboard (returnguard.json) at startup.
+apiVersion: 1
+providers:
+  - name: returnguard
+    orgId: 1
+    folder: ReturnGuard
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
